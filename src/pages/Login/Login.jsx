@@ -6,6 +6,7 @@ import { logUser } from "../../services/apiCalls";
 import { useNavigate } from "react-router-dom";
 import { errorCheck } from "../../services/useful";
 import './Login.css'
+import { TextInput } from "../../common/TextInput/TextInput";
 
 export const Login = () => {
   const navigate = useNavigate();
@@ -22,24 +23,6 @@ export const Login = () => {
   })
 
   const [logged, setLogged] = useState(false);
-
-  const inputHandler = ({ target }) => {
-    const { name, value } = target;
-    setUserCredentials((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-  };
-
-  const errorHandler = ({target}, password1) =>{
-    const {name, value} = target;
-    let message = errorCheck(name, value, password1)
-
-    setUserError((prevState) => ({
-      ...prevState,
-      [name] : message
-    }))
-  }
 
   const submitHandler = (e) => {
     e.preventDefault();
@@ -78,14 +61,23 @@ export const Login = () => {
                 controlId="formBasicEmail"
               >
                 <Form.Label>Email address</Form.Label>
-                <Form.Control
+                <TextInput
+                  type={"email"}
+                  name={"email"}
+                  placeholder={"Enter your email"}
+                  design={userError.email ? ("errorInput") : ("")}
+                  state={setUserCredentials}
+                  errorState={setUserError}
+                  password1={""}
+                />
+                {/* <Form.Control
                   type="email"
                   placeholder="Enter email"
                   name="email"
                   className={userError.email ? ("errorInput") : ("")}
                   onChange={(e) => inputHandler(e)}
                   onBlur={(e) => errorHandler(e)}
-                />
+                /> */}
                 {userError.email ? (<div>{userError.email}</div>) : (<div></div>)}
               </Form.Group>
 
@@ -94,13 +86,22 @@ export const Login = () => {
                 controlId="formBasicPassword"
               >
                 <Form.Label>Password</Form.Label>
-                <Form.Control
+                {/* <Form.Control
                   type="password"
                   placeholder="Password"
                   name="password"
                   className={userError.password ? ("errorInput") : ("")}
                   onChange={(e) => inputHandler(e)}
                   onBlur={(e) => errorHandler(e)}
+                /> */}
+                <TextInput
+                  type={"password"}
+                  name={"password"}
+                  placeholder={"Enter your password"}
+                  design={userError.password ? ("errorInput") : ("")}
+                  state={setUserCredentials}
+                  errorState={setUserError}
+                  password1={""}
                 />
                 {userError.password ? (<div>{userError.password}</div>) : (<div></div>)}
               </Form.Group>
