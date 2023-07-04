@@ -4,6 +4,8 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { logUser } from "../../services/apiCalls";
 import { useNavigate } from "react-router-dom";
+import { errorCheck } from "../../services/useful";
+import './Login.css'
 
 export const Login = () => {
   const navigate = useNavigate();
@@ -12,6 +14,12 @@ export const Login = () => {
     email: "",
     password: "",
   });
+
+  const [userError, setUserError] = useState({
+    email: "",
+    password: "",
+    credentials: ""
+  })
 
   const [logged, setLogged] = useState(false);
 
@@ -23,12 +31,29 @@ export const Login = () => {
     }));
   };
 
+  const errorHandler = ({target}, password1) =>{
+    const {name, value} = target;
+    let message = errorCheck(name, value, password1)
+
+    setUserError((prevState) => ({
+      ...prevState,
+      [name] : message
+    }))
+  }
+
   const submitHandler = (e) => {
     e.preventDefault();
     logUser(userCredentials).then((res) => {
       sessionStorage.setItem("token", res.token);
       setLogged(true);
-    });
+    })
+    .catch(error => {console.log(error)
+      let errorMessage = error.response.data.message
+    setUserError((prevState) => ({
+      ...prevState,
+      credentials: errorMessage
+    }))
+    })
   };
 
   useEffect(() => {
@@ -47,6 +72,7 @@ export const Login = () => {
             lg={4}
           >
             <Form>
+              {userError.credentials ? (<div>{userError.credentials}</div>) : (<div></div>)}
               <Form.Group
                 className="mb-3"
                 controlId="formBasicEmail"
@@ -56,11 +82,11 @@ export const Login = () => {
                   type="email"
                   placeholder="Enter email"
                   name="email"
+                  className={userError.email ? ("errorInput") : ("")}
                   onChange={(e) => inputHandler(e)}
+                  onBlur={(e) => errorHandler(e)}
                 />
-                <Form.Text className="text-muted">
-                  We'll never share your email with anyone else.
-                </Form.Text>
+                {userError.email ? (<div>{userError.email}</div>) : (<div></div>)}
               </Form.Group>
 
               <Form.Group
@@ -72,8 +98,11 @@ export const Login = () => {
                   type="password"
                   placeholder="Password"
                   name="password"
+                  className={userError.password ? ("errorInput") : ("")}
                   onChange={(e) => inputHandler(e)}
+                  onBlur={(e) => errorHandler(e)}
                 />
+                {userError.password ? (<div>{userError.password}</div>) : (<div></div>)}
               </Form.Group>
               <Form.Group
                 className="mb-3"
